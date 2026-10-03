@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#020b22">
+<title>Alphabet interactif</title>
+
+<style>
+/* =========================================================
+   ALPHABET INTERACTIF — INTERFACE UNIQUEMENT
+   ---------------------------------------------------------
+   لإضافة بطاقة جديدة: انسخ كتلة واحدة من cards-container
+   وعدّل الحرف والرابط في نفس المكان.
+   ========================================================= */
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    font-family:Arial, Helvetica, sans-serif;
+    color:#fff;
+    overflow-x:hidden;
+
+    /* خلفية زرقاء داكنة ساحرة */
+    background:
+        radial-gradient(circle at 12% 15%, rgba(0,153,255,.30), transparent 24%),
+        radial-gradient(circle at 86% 12%, rgba(71,64,255,.28), transparent 26%),
+        radial-gradient(circle at 50% 90%, rgba(0,217,255,.16), transparent 32%),
+        linear-gradient(135deg,#010817 0%,#031536 38%,#061d46 65%,#010817 100%);
+}
+
+/* طبقة النجوم */
+body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    opacity:.55;
+    background-image:
+        radial-gradient(circle,rgba(255,255,255,.8) 1px,transparent 1.5px),
+        radial-gradient(circle,rgba(52,196,255,.7) 1px,transparent 1.5px);
+    background-size:75px 75px,125px 125px;
+    background-position:10px 20px,45px 70px;
+    mask-image:linear-gradient(to bottom,black,transparent 95%);
+}
+
+/* هالة ضوئية */
+.aurora{
+    position:fixed;
+    width:550px;
+    height:550px;
+    border-radius:50%;
+    filter:blur(100px);
+    opacity:.18;
+    pointer-events:none;
+    background:#008cff;
+    top:-220px;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.header{
+    position:relative;
+    z-index:2;
+    text-align:center;
+    padding:58px 20px 38px;
+}
+
+.logo{
+    width:78px;
+    height:78px;
+    margin:0 auto 18px;
+    display:grid;
+    place-items:center;
+    border-radius:24px;
+
+    font-size:38px;
+
+    background:
+        linear-gradient(145deg,#0cc9ff,#175cff 55%,#3725d9);
+
+    border:1px solid rgba(255,255,255,.25);
+
+    box-shadow:
+        0 0 35px rgba(0,177,255,.40),
+        0 0 90px rgba(36,73,255,.25),
+        inset 0 1px 0 rgba(255,255,255,.45);
+
+    animation:floatLogo 4s ease-in-out infinite;
+}
+
+@keyframes floatLogo{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(-7px)}
+}
+
+.title{
+    font-size:clamp(32px,6vw,64px);
+    font-weight:900;
+    letter-spacing:2px;
+
+    background:linear-gradient(
+        90deg,
+        #ffffff,
+        #74dcff,
+        #ffffff,
+        #8ca8ff
+    );
+
+    background-size:300% auto;
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+
+    animation:titleShine 7s linear infinite;
+
+    text-shadow:0 0 35px rgba(0,187,255,.20);
+}
+
+@keyframes titleShine{
+    to{background-position:300% center}
+}
+
+.subtitle{
+    max-width:760px;
+    margin:13px auto 0;
+    color:#9ebce3;
+    font-size:clamp(13px,2vw,17px);
+    line-height:1.7;
+}
+
+/* خط مضيء */
+.light-line{
+    width:min(480px,75%);
+    height:2px;
+    margin:25px auto 0;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #18caff,
+        #6477ff,
+        transparent
+    );
+
+    box-shadow:0 0 20px #00bfff;
+}
+
+/* =========================================================
+   CARDS
+   ========================================================= */
+
+.cards-container{
+    position:relative;
+    z-index:2;
+
+    width:min(1250px,94%);
+    margin:0 auto;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fit,minmax(145px,1fr));
+
+    gap:20px;
+
+    padding:15px 0 65px;
+}
+
+.card{
+    position:relative;
+    min-height:165px;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    border-radius:26px;
+
+    cursor:pointer;
+    user-select:none;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(15,59,112,.80),
+            rgba(3,23,57,.88)
+        );
+
+    border:1px solid rgba(108,210,255,.25);
+
+    box-shadow:
+        0 14px 35px rgba(0,0,0,.35),
+        inset 0 1px 0 rgba(255,255,255,.10);
+
+    overflow:hidden;
+
+    transition:
+        transform .35s ease,
+        border-color .35s ease,
+        box-shadow .35s ease;
+}
+
+/* خط لامع أعلى البطاقة */
+.card::before{
+    content:"";
+    position:absolute;
+    top:0;
+    left:10%;
+    width:80%;
+    height:2px;
+
+    background:linear-gradient(
+        90deg,
+        transparent,
+        #27d8ff,
+        #6376ff,
+        transparent
+    );
+
+    box-shadow:0 0 16px #00bfff;
+}
+
+/* هالة داخلية */
+.card::after{
+    content:"";
+    position:absolute;
+    width:150px;
+    height:150px;
+    border-radius:50%;
+    background:#00aaff;
+    filter:blur(70px);
+    opacity:.08;
+    transition:.35s;
+}
+
+.card:hover{
+    transform:
+        translateY(-10px)
+        scale(1.025);
+
+    border-color:#42d9ff;
+
+    box-shadow:
+        0 22px 50px rgba(0,0,0,.50),
+        0 0 30px rgba(0,188,255,.20),
+        inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.card:hover::after{
+    opacity:.20;
+}
+
+.card:active{
+    transform:translateY(-3px) scale(.99);
+}
+
+/* الحرف */
+.letter{
+    position:relative;
+    z-index:2;
+
+    font-size:clamp(54px,7vw,78px);
+    font-weight:900;
+
+    background:
+        linear-gradient(
+            145deg,
+            #ffffff,
+            #65dcff 48%,
+            #6584ff
+        );
+
+    -webkit-background-clip:text;
+    background-clip:text;
+    color:transparent;
+
+    filter:drop-shadow(0 0 14px rgba(43,201,255,.35));
+
+    transition:.35s;
+}
+
+.card:hover .letter{
+    filter:
+        drop-shadow(0 0 22px rgba(30,215,255,.75))
+        drop-shadow(0 0 45px rgba(75,90,255,.30));
+
+    transform:scale(1.08);
+}
+
+/* رقم/حالة البطاقة */
+.card-status{
+    position:absolute;
+    bottom:12px;
+    right:13px;
+    left:13px;
+
+    text-align:center;
+
+    font-size:10px;
+    color:#7fa8d9;
+    letter-spacing:.5px;
+    z-index:3;
+}
+
+.card.has-link .card-status{
+    color:#63dfff;
+}
+
+/* =========================================================
+   TOAST
+   ========================================================= */
+
+.toast{
+    position:fixed;
+    z-index:20;
+
+    left:50%;
+    bottom:28px;
+
+    transform:
+        translate(-50%,120px);
+
+    min-width:min(380px,88%);
+    padding:15px 20px;
+
+    text-align:center;
+
+    border-radius:18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,43,86,.96),
+            rgba(8,24,58,.98)
+        );
+
+    border:1px solid rgba(61,211,255,.35);
+
+    box-shadow:
+        0 20px 50px rgba(0,0,0,.50),
+        0 0 25px rgba(0,175,255,.15);
+
+    color:#dff8ff;
+
+    opacity:0;
+    pointer-events:none;
+
+    transition:
+        transform .35s ease,
+        opacity .35s ease;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translate(-50%,0);
+}
+
+.toast strong{
+    color:#51dcff;
+}
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer{
+    position:relative;
+    z-index:2;
+
+    padding:25px 15px 30px;
+
+    text-align:center;
+
+    color:#6f94c4;
+
+    border-top:1px solid rgba(255,255,255,.07);
+
+    background:rgba(1,9,25,.55);
+
+    font-size:12px;
+}
+
+.footer span{
+    color:#42cfff;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media(max-width:600px){
+
+    .header{
+        padding:40px 15px 28px;
+    }
+
+    .logo{
+        width:65px;
+        height:65px;
+        font-size:31px;
+        border-radius:20px;
+    }
+
+    .cards-container{
+        width:92%;
+        grid-template-columns:
+            repeat(2,1fr);
+        gap:12px;
+        padding-bottom:45px;
+    }
+
+    .card{
+        min-height:135px;
+        border-radius:21px;
+    }
+
+    .letter{
+        font-size:55px;
+    }
+}
+
+@media(min-width:601px) and (max-width:900px){
+
+    .cards-container{
+        grid-template-columns:
+            repeat(3,1fr);
+    }
+
+}
+
+@media(min-width:1200px){
+
+    .cards-container{
+        grid-template-columns:
+            repeat(6,1fr);
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="aurora"></div>
+
+<header class="header">
+
+    <div class="logo">A</div>
+
+    <h1 class="title">
+        Alphabet interactif
+    </h1>
+    <!-- ✏️ غيّر العنوان أعلاه حسب مشروعك -->
+
+    <p class="subtitle">
+        Choisissez une lettre pour accéder directement à son contenu pédagogique.
+    </p>
+
+    <div class="light-line"></div>
+
+</header>
+
+
+<!-- =====================================================
+     البطاقات
+
+     IMPORTANT :
+     لإضافة بطاقة:
+     1. انسخ بطاقة كاملة.
+     2. غيّر الحرف.
+     3. ضع الرابط في data-url.
+
+     إذا تركت data-url فارغًا:
+     ستظهر البطاقة عاديًا، وعند الضغط عليها
+     تظهر رسالة "لم يتم إضافة المحتوى".
+====================================================== -->
+
+<main class="cards-container" id="cardsContainer">
+
+
+    <!-- =========================
+         البطاقة A
+    ========================== -->
+
+    <div
+        class="card has-link"
+        data-letter="a A"
+        data-url=""
+    >
+        <div class="letter">a A</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+
+    <!-- =========================
+         البطاقة B
+    ========================== -->
+
+    <div
+        class="card"
+        data-letter="b B"
+        data-url=""
+    >
+        <div class="letter">b B</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+
+    <!-- =========================
+         البطاقة C
+    ========================== -->
+
+    <div
+        class="card"
+        data-letter="c C"
+        data-url=""
+    >
+        <div class="letter">c C</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+
+    <!-- =========================
+         البطاقة D
+    ========================== -->
+
+    <div
+        class="card"
+        data-letter="d D"
+        data-url=""
+    >
+        <div class="letter">d D</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+
+    <!--
+    ======================================================
+    مثال إضافة بطاقة جديدة:
+
+    انسخ هذه الكتلة والصقها هنا:
+
+    <div
+        class="card"
+        data-letter="e E"
+        data-url="https://monsite.com/e"
+    >
+        <div class="letter">e E</div>
+        <div class="card-status">ACCÉDER AU CONTENU</div>
+    </div>
+
+    ======================================================
+    -->
+
+
+    <!-- =========================
+         البطاقة E
+    ========================== -->
+
+    <div
+        class="card"
+        data-letter="e E"
+        data-url=""
+    >
+        <div class="letter">e E</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+
+    <div class="card" data-letter="f F" data-url="">
+        <div class="letter">f F</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="g G" data-url="">
+        <div class="letter">g G</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="h H" data-url="">
+        <div class="letter">h H</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="i I" data-url="">
+        <div class="letter">i I</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="j J" data-url="">
+        <div class="letter">j J</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="k K" data-url="">
+        <div class="letter">k K</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="l L" data-url="">
+        <div class="letter">l L</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="m M" data-url="https://ibnelkadimounir-cyber.github.io/m/">
+        <div class="letter">m M</div>
+        <div class="card-status">CONTENU DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="n N" data-url="">
+        <div class="letter">n N</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="o O" data-url="">
+        <div class="letter">o O</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="p P" data-url="">
+        <div class="letter">p P</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="q Q" data-url="">
+        <div class="letter">q Q</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="r R" data-url="">
+        <div class="letter">r R</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="s S" data-url="">
+        <div class="letter">s S</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="t T" data-url="">
+        <div class="letter">t T</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="u U" data-url="">
+        <div class="letter">u U</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="v V" data-url="">
+        <div class="letter">v V</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="w W" data-url="">
+        <div class="letter">w W</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="x X" data-url="">
+        <div class="letter">x X</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="y Y" data-url="">
+        <div class="letter">y Y</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+    <div class="card" data-letter="z Z" data-url="">
+        <div class="letter">z Z</div>
+        <div class="card-status">CONTENU NON DISPONIBLE</div>
+    </div>
+
+</main>
+
+
+<div class="toast" id="toast">
+    <strong id="toastLetter"></strong>
+    <br>
+    Le contenu de cette carte n’a pas encore été ajouté.
+</div>
+
+
+<footer class="footer">
+    <strong>Alphabet interactif</strong> •
+    <span>Plateforme pédagogique</span>
+    <!--  يمكنك تغيير نص أسفل الصفحة هنا -->
+</footer>
+
+
+<script>
+
+/* =========================================================
+   GESTION DES CARTES
+   لا تحتاج إلى تعديل هذا الجزء.
+========================================================= */
+
+const cards =
+    document.querySelectorAll(".card");
+
+const toast =
+    document.getElementById("toast");
+
+const toastLetter =
+    document.getElementById("toastLetter");
+
+let toastTimer;
+
+
+cards.forEach(card => {
+
+    const url =
+        card.dataset.url.trim();
+
+    const letter =
+        card.dataset.letter;
+
+
+    /* بطاقة لها رابط */
+
+    if(url !== ""){
+
+        card.classList.add("has-link");
+
+        card.addEventListener("click", () => {
+
+            /*
+              فتح الرابط في نفس الصفحة.
+
+              إذا أردت فتحه في نافذة/تبويب جديد:
+              window.open(url, "_blank");
+            */
+
+            window.location.href = url;
+
+        });
+
+    }
+
+
+    /* بطاقة بدون رابط */
+
+    else{
+
+        card.addEventListener("click", () => {
+
+            showMissingContent(letter);
+
+        });
+
+    }
+
+});
+
+
+function showMissingContent(letter){
+
+    toastLetter.textContent =
+        "Carte " + letter;
+
+    toast.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer =
+        setTimeout(() => {
+
+            toast.classList.remove("show");
+
+        },3500);
+
+}
+
+</script>
+
+</body>
+</html>
